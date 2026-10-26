@@ -1,0 +1,29 @@
+<template>
+    <article class="monitor-shell" aria-busy={isLoading}>
+        <header class="monitor-header slds-grid slds-wrap slds-grid_align-spread">
+            <div class="slds-grid slds-grid_vertical-align-center">
+                <lightning-icon icon-name="utility:heartbeat" size="small" alternative-text="API health"></lightning-icon>
+                <div class="slds-m-left_small"><h1 class="slds-text-heading_medium">Integration Health</h1><p class="slds-text-body_small">Live endpoint availability and response-time observability</p></div>
+            </div>
+            <lightning-button label="Refresh" icon-name="utility:refresh" onclick={handleRefresh} disabled={isLoading} class="refresh-button"></lightning-button>
+        </header>
+        <template if:true={error}><div class="slds-notify slds-notify_alert slds-alert_error slds-m-top_medium" role="alert"><span class="slds-assistive-text">Error</span><lightning-icon icon-name="utility:error" size="x-small" alternative-text="Error"></lightning-icon><h2 class="slds-m-left_small">{error}</h2></div></template>
+        <section class="kpi-grid slds-m-top_medium" aria-label="Health summary">
+            <div class="kpi-card healthy-card"><div class="kpi-top"><span class="kpi-label">Healthy APIs</span><lightning-icon icon-name="utility:success" size="x-small" alternative-text="Healthy"></lightning-icon></div><strong>{healthyCount}</strong><span class="kpi-detail">Responding as expected</span></div>
+            <div class="kpi-card failed-card"><div class="kpi-top"><span class="kpi-label">Failed APIs</span><lightning-icon icon-name="utility:error" size="x-small" alternative-text="Failed"></lightning-icon></div><strong>{failedCount}</strong><span class="kpi-detail">Need attention</span></div>
+            <div class="kpi-card unknown-card"><div class="kpi-top"><span class="kpi-label">Unknown APIs</span><lightning-icon icon-name="utility:help" size="x-small" alternative-text="Unknown"></lightning-icon></div><strong>{unknownCount}</strong><span class="kpi-detail">No check recorded yet</span></div>
+            <div class="kpi-card latency-card"><div class="kpi-top"><span class="kpi-label">Average latency</span><lightning-icon icon-name="utility:timer" size="x-small" alternative-text="Latency"></lightning-icon></div><strong>{averageLatency}</strong><span class="kpi-detail">Across latest checks</span></div>
+        </section>
+        <section class="panel slds-m-top_medium" aria-labelledby="latency-title">
+            <div class="panel-heading"><div><h2 id="latency-title">Latency history</h2><p>Most recent persisted health checks</p></div><span class="slds-badge">Last {historyCount}</span></div>
+            <template if:true={hasSufficientHistory}><div class="chart-wrap" role="img" aria-label={chartDescription}><svg class="latency-chart" viewBox="0 0 640 160" preserveAspectRatio="xMidYMid meet"><line class="chart-grid" x1="70" y1="20" x2="610" y2="20"></line><line class="chart-grid" x1="70" y1="76" x2="610" y2="76"></line><line class="chart-axis" x1="70" y1="132" x2="610" y2="132"></line><line class="chart-axis" x1="70" y1="20" x2="70" y2="132"></line><text class="axis-text" x="8" y="24">{yAxisMaxLabel}</text><text class="axis-text" x="8" y="80">{yAxisMidLabel}</text><text class="axis-text" x="8" y="136">{yAxisMinLabel}</text><polyline class="chart-line" points={chartLine}></polyline><template for:each={chartPoints} for:item="point"><circle key={point.key} class={point.cssClass} cx={point.x} cy={point.y} r="4"><title>{point.title}</title></circle></template></svg><div class="chart-labels"><span>{firstHistoryLabel}</span><span>{middleHistoryLabel}</span><span>{lastHistoryLabel}</span></div></div></template>
+            <template if:false={hasSufficientHistory}><div class="empty-chart"><lightning-icon icon-name="utility:chart" size="small" alternative-text=""></lightning-icon><p>{historyStateMessage}</p></div></template>
+        </section>
+        <section class="panel slds-m-top_medium" aria-labelledby="endpoint-title">
+            <div class="panel-heading"><div><h2 id="endpoint-title">Endpoint status</h2><p>Latest result for each active configuration</p></div></div>
+            <template if:true={hasEndpoints}><div class="table-scroll"><table class="slds-table slds-table_cell-buffer slds-table_bordered endpoint-table"><thead><tr><th scope="col">Endpoint</th><th scope="col">Status</th><th scope="col">Last checked</th><th scope="col">HTTP</th><th scope="col">Latency</th><th scope="col"><span class="slds-assistive-text">Actions</span></th></tr></thead><tbody><template for:each={endpoints} for:item="endpoint"><tr key={endpoint.configKey}><th scope="row"><div class="endpoint-name">{endpoint.displayName}</div><template if:true={endpoint.lastErrorMessage}><div class="endpoint-error">{endpoint.lastErrorMessage}</div></template></th><td><span class={endpoint.badgeClass}>{endpoint.statusLabel}</span></td><td>{endpoint.formattedCheckedAt}</td><td>{endpoint.formattedStatusCode}</td><td>{endpoint.formattedDuration}</td><td><lightning-button label="Check now" variant="base" data-key={endpoint.configKey} onclick={handleCheckNow} disabled={isLoading}></lightning-button></td></tr></template></tbody></table></div></template>
+            <template if:false={hasEndpoints}><div class="empty-chart"><lightning-icon icon-name="utility:connected_apps" size="small" alternative-text=""></lightning-icon><p>No active endpoint configurations are available.</p></div></template>
+        </section>
+        <template if:true={isLoading}><div class="loading-overlay"><lightning-spinner alternative-text="Loading API health data" size="small"></lightning-spinner></div></template>
+    </article>
+</template>

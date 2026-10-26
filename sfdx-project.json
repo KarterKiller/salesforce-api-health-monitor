@@ -1,0 +1,6 @@
+{
+  "packageDirectories": [{ "path": "force-app", "default": true }],
+  "name": "salesforce-api-health-monitor",
+  "namespace": "",
+  "sourceApiVersion": "64.0"
+}

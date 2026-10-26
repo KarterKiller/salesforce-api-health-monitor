@@ -1,0 +1,25 @@
+# Salesforce local state and authentication
+.sf/
+.sfdx/
+.env
+.env.*
+!.env.example
+.npmrc
+
+# Local agent instructions and project planning notes
+AGENTS.md
+PROJECT-001-CODEX-PROMPT.md
+
+# Dependencies and generated output
+node_modules/
+coverage/
+test-results/
+.nyc_output/
+*.log
+
+# Editor and operating-system files
+.vscode/
+.idea/
+*.swp
+Thumbs.db
+.DS_Store
